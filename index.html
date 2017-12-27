@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/jquery-3.2.1.min.js"></script>
+    <script>
+        function deal() {
+            var data = $('#data').val();
+            $.post('/index/',{data : data},function (result) {
+                $('#result').append(result);
+            })
+        }
+
+    </script>
+</head>
+<body>
+    <input id='data' type="text" >
+    <input type="button" value="提交" onclick="deal();">
+    <span>测试结果：</span>
+    <p id="result">
+
+    </p>
+</body>
+</html>

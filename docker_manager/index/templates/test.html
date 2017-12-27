@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/static/js/jquery.min.js"></script>
+    <script>
+        $(function () {
+            var ws = new WebSocket("ws://127.0.0.1/test/");
+            ws.onopen = function(){
+                              console.log("open");
+                              ws.send("hello");
+                                };
+            ws.onmessage = function (p1) {
+                console.log('recived!');
+                $('#result').append(p1);
+            };
+        });
+
+    </script>
+</head>
+<body>
+    <input type="text" id="content" value="kkkkk">
+    <input type="button" value="发送" onclick="test();">
+    <p id="result"></p>
+</body>
+</html>
