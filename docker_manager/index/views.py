@@ -100,8 +100,7 @@ def create_container(request):
     if request.POST:
         create_params = request.POST.get('create_params', '')
         p = DockerContainer()
-        res = p.container_run(eval(create_params))
-    return HttpResponse(res)
+    return HttpResponse(p.container_run(eval(create_params)))
 
 
 @csrf_exempt
