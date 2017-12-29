@@ -56,10 +56,10 @@ class BaseLogsProcess(ABC):
         :return:
         """
         if pid in psutil.pids():
-            ##下载进程存在
+            # 下载进程存在
             return 1
         else:
-            ##下载进程结束
+            # 下载进程结束
             return 0
 
     @abstractmethod

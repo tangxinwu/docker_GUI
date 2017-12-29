@@ -353,24 +353,28 @@
                         </div>
                         <div class="content">
                             <form method="get" action="/" class="form-horizontal">
-
+                                <div id="port_area">
                                     <fieldset>
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">端口映射</label>
-                                            <div class="col-sm-3">
+                                            <div class="col-sm-2">
                                                 <input type="text" class="form-control" placeholder="外部端口">
                                             </div>
-                                            <div class="col-sm-3">
-                                                <select  class="selectpicker" data-title="Single Select" data-style="btn-default btn-block" data-menu-style="dropdown-blue" tabindex="-98"><option class="bs-title-option" value="">选择协议</option>
+                                            <div class="col-sm-2">
+                                                <select  class="form-control" data-title="Single Select" data-style="btn-default btn-block" data-menu-style="dropdown-blue" tabindex="-98"><option class="bs-title-option" value="">选择协议</option>
                                                     <option>tcp</option>
                                                     <option>udp</option>
                                                 </select>
                                             </div>
-                                            <div class="col-sm-3">
+                                            <div class="col-sm-2">
                                                 <input type="text" class="form-control" placeholder="内部端口">
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <a href="#" class="btn btn-simple btn-danger btn-icon remove" onclick="var object=$(this);custom_port('delete',object);"><i class="pe-7s-trash"></i></a>
                                             </div>
                                         </div>
                                     </fieldset>
+                                </div>
                                 </form>
                         </div>
                     </div>
@@ -378,7 +382,7 @@
 
             </div>
             <div class="modal-footer" style="text-align: center;">
-                <button class="btn btn-info btn-fill btn-wd" onclick="alert('测试!');">测试</button>
+                <button class="btn btn-info btn-fill btn-wd" onclick="custom_port('add');">增加端口</button>
                 <button type="button" data-dismiss="modal" class="btn btn-info btn-fill btn-wd">关闭</button>
             </div>
         </div>

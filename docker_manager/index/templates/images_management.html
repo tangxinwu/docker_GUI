@@ -399,17 +399,30 @@
                                         </div>
                                     </fieldset>
 
+
+                                <div id="port_area">
                                     <fieldset>
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">映射端口</label>
-                                            <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="port" placeholder="容器内端口">
-                                                <input type="text" class="form-control" id="port" placeholder="容器内端口">
+                                            <label class="col-sm-2 control-label">端口映射</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" placeholder="内部端口">
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <select  class="form-control" data-title="Single Select" data-style="btn-default btn-block" data-menu-style="dropdown-blue" tabindex="-98"><option class="bs-title-option" value="">选择协议</option>
+                                                    <option>tcp</option>
+                                                    <option>udp</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" placeholder="外部端口">
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <a href="#" class="btn btn-simple btn-danger btn-icon remove" onclick="var object=$(this);custom_port('delete',object);"><i class="pe-7s-trash"></i></a>
                                             </div>
                                         </div>
                                     </fieldset>
-
-                                    <fieldset>
+                                </div>
+                                <fieldset>
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">运行选项</label>
                                             <div class="col-sm-10">
@@ -434,6 +447,7 @@
 
             </div>
             <div class="modal-footer" style="text-align: center;">
+                <button class="btn btn-info btn-fill btn-wd" value="增加端口" onclick="custom_port('add');" >新增端口</button>
                 <button class="btn btn-info btn-fill btn-wd" onclick="create_container();">创建容器</button>
                 <button type="button" data-dismiss="modal" class="btn btn-info btn-fill btn-wd">关闭</button>
             </div>

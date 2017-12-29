@@ -22,7 +22,9 @@ class DockerContainer:
         temp = list()
         for i in args:
             if i.split(',')[1] in ('true', 'false'):
-                temp.append((i.split(',')[0], eval(i.split(',')[1].replace(i.split(',')[1][0], i.split(',')[1][0].upper()))))
+                temp.append((i.split(',')[0], eval(i.split(',')[1].capitalize())))
+            elif i.split(',')[0] == "ports":
+                temp.append((i.split(',', 1)[0], eval(i.split(',', 1)[1])))
             else:
                 temp.append((i.split(',')[0], i.split(',')[1]))
         params = dict(temp)
@@ -37,11 +39,16 @@ class DockerContainer:
             print('显示错误上', str(e))
             already_exsit_error = re.findall('is already in use by container', str(e))
             execute_file_not_found_error = re.findall('executable file not found in \$PATH', str(e))
+            port_already_used_error = re.findall("port is already allocated", str(e))
             if already_exsit_error:
                 result = params.get('name') + ' 已经存在！'
             if execute_file_not_found_error:
                 result = '命令' + command + "在环境变量中没有找到！"
-                self._init_client().containers.remove(params.get('name'))
+                self._init_client().containers.get(params.get('name')).remove()
+            if port_already_used_error:
+                result = "有些端口正在使用中，请检查端口映射！"
+                print("创建的容器名", params.get("name"))
+                self._init_client().containers.get(params.get('name')).remove()
 
         except docker.errors.ContainerError as e:
             print("显示错误", str(e))

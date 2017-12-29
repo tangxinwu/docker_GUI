@@ -34,7 +34,7 @@ class DockerPull(BasePull):
         repository, tag = repository_and_tag
         tag = (lambda tag:tag if tag else "latest")(tag)
         self.tag = repository + "_" + tag
-        self.result = self.client.pull(repository,tag=tag)
+        self.result = self.client.pull(repository, tag=tag)
         return self
 
     def mutil_pull(self, repository_and_tag_list):
@@ -58,10 +58,10 @@ class DockerPull(BasePull):
         repository, tag = repository_and_tag
         flag = [i for i in self.client.images.list() if repository + ':' + tag in i.tags]
         if flag:
-            ##镜像已经存在
+            # 镜像已经存在
             return 1
         else:
-            ##镜像不存在
+            # 镜像不存在
             return 0
 
 
@@ -88,9 +88,8 @@ class DockerLogs(BaseLogsProcess):
                 'complete': {'PullStatus': 1},
                 'failed': {'PullStatus': 2},
             }
-            cur.execute("""update index_imagepull set PullStatus='%d' where ImageName='%s'""" %(int(status.get(kwargs.get('status')).get('PullStatus')),kwargs.get('update_tag')))
+            cur.execute("""update index_imagepull set PullStatus='%d' where ImageName='%s'""" % (int(status.get(kwargs.get('status')).get('PullStatus')),kwargs.get('update_tag')))
             cur.execute("""commit;""")
-
 
     def status_log(self, **kwargs):
         """
@@ -105,7 +104,6 @@ class DockerLogs(BaseLogsProcess):
                     self.gen_logs(status='failed', update_tag='_'.join(kwargs.get('repository_and_tag')))
                 else:
                     self.gen_logs(status='complete', update_tag='_'.join(kwargs.get('repository_and_tag')))
-
 
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ class DockerCheck:
         if not socket:
             self.client = docker.from_env()
         else:
-            ##先看下参数设置把
+            # 先看下参数设置把
             pass
 
     def set_object(self, object_type):
@@ -80,9 +80,9 @@ class DockerCheck:
         """
         try:
             self.client.images.remove(image_name)
-            return "镜像 %s 成功被移除！" % (image_name)
+            return "镜像 %s 成功被移除！" % image_name
         except:
-            return "镜像 %s 移除失败，检查是否有容易正在使用他！" % (image_name)
+            return "镜像 %s 移除失败，检查是否有容易正在使用他！" % image_name
 
     def get_image_status(self, image_name):
         """

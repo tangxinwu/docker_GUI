@@ -26,16 +26,16 @@ def index(request):
 
 @csrf_exempt
 def images_management(request):
-    ##显示镜像的数量和名字
+    # 显示镜像的数量和名字
     d_k = DockerCheck()
     d_k.set_object('images')
     images = d_k.list_objects()
     notifications = ImagePull.objects.filter(PullStatus__in=(0, 2))
     d_p = DockerLogs()
 
-    #检测镜像下载的状态
-    for object in notifications:
-        d_p.status_log(pid=object.pid, repository_and_tag=tuple(object.ImageName.split('_')))
+    # 检测镜像下载的状态
+    for OBJECT in notifications:
+        d_p.status_log(pid=OBJECT.pid, repository_and_tag=tuple(OBJECT.ImageName.split('_')))
     notifications_len = len(notifications)
     return render(request, 'images_management.html', locals())
 
@@ -52,7 +52,7 @@ def pull_images(request):
             flag = ImagePull.objects.filter(ImageName=repository + '_' + tag)
             # 此分支只处理flag存在的情况，传入的下载的镜像名字，检测数据库条目，如果存在下载的镜像对应的条目
             if flag:
-                ##更新传入的镜像名字对应的镜像存在的情况##
+                # 更新传入的镜像名字对应的镜像存在的情况##
                 if flag.filter(PullStatus=0):
                     DL = DockerLogs()
                     if DL.pid_isExsit(pid=flag.get(PullStatus=0).pid):
@@ -62,9 +62,9 @@ def pull_images(request):
 
             script_file_path = os.path.join(os.path.dirname(__file__), 'DockerPull.py')
             try:
-                process = subprocess.Popen('pythonw %s %s %s' %(script_file_path, repository, tag), shell=True ,stdout=subprocess.PIPE)
+                process = subprocess.Popen('pythonw %s %s %s' % (script_file_path, repository, tag), shell=True, stdout=subprocess.PIPE)
             except:
-                process = subprocess.Popen('python3 %s %s %s &' %(script_file_path, repository, tag), shell=False, stdout=subprocess.PIPE)
+                process = subprocess.Popen('python3 %s %s %s &' % (script_file_path, repository, tag), shell=False, stdout=subprocess.PIPE)
             finally:
                 ImagePull.objects.create(ImageName=repository + '_' + tag, PullStatus=0, pid=process.pid)
 
@@ -98,9 +98,20 @@ def create_container(request):
     :return:
     """
     if request.POST:
-        create_params = request.POST.get('create_params', '')
+        create_params = eval(request.POST.get('create_params', ''))
+        port_list = eval(request.POST.get("port_list", ""))
+        protocl_list = eval(request.POST.get("protocl_list", ""))
         p = DockerContainer()
-    return HttpResponse(p.container_run(eval(create_params)))
+        # js处理数组方法不是太熟 放到后台来处理传入的端口映射
+        if any(port_list):
+            temp_port_list1 = port_list[::2]   # 存放外部端口
+            temp_port_list2 = port_list[1::2]  # 存放内部端口
+            temp_proctol_list = protocl_list   # 存放每个端口对应的协议
+            result1 = ["/".join(i) for i in list(zip(temp_port_list1, temp_proctol_list))]
+            result2 = list(zip(result1, map(int, temp_port_list2)))
+            create_params.append("ports,%s" % str(dict(result2)))
+        return HttpResponse(p.container_run(create_params))
+    return HttpResponse("没有输入！")
 
 
 @csrf_exempt
@@ -116,7 +127,7 @@ def container_exec(request):
         try:
             return HttpResponse(DockerContainer.execute_command(container_name, cmd))
         except docker.errors.APIError:
-            return HttpResponse("%s 没有在运行状态!" %(container_name))
+            return HttpResponse("%s 没有在运行状态!" % container_name)
     return HttpResponse("没有输入")
 
 
@@ -128,11 +139,11 @@ def image_detail(request):
     :return:
     """
     if request.POST:
-        image_name = request.POST.get("image_name", "").split(",")[0] #多个标签对应的是一个镜像，只取一个
+        image_name = request.POST.get("image_name", "").split(",")[0]  # 多个标签对应的是一个镜像，只取一个
         dc = DockerCheck()
         dc.set_object('images')
         return HttpResponse(str(dc.get_image_status(image_name)))
-    return HttpResponse("xxx")
+    return HttpResponse("没有输入！")
 
 
 @csrf_exempt
@@ -148,7 +159,7 @@ def delete_image(request):
         dc.set_object("image")
         res = dc.delete_image(image_name)
         return HttpResponse(res)
-    return HttpResponse("xxx")
+    return HttpResponse("没有输入！")
 
 
 @csrf_exempt

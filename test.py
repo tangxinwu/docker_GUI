@@ -94,15 +94,30 @@
 # # import os
 # #
 # #
-# # def show(path):
-# #     for i in os.walk(path):
-# #         if i[2]:
-# #             for k in i[2]:
-# #                 file_path = os.path.join(i[0],k)
-# #                 file_size = os.path.getsize(file_path)/1024**2
-# #                 if file_size >= 5:
-# #                     print(str(file_path) + '-->' + str(round(file_size, 2)) + ' MB')
-# #                     copy_file(file_path, os.path.join(r'd:/', os.path.basename(file_path)))
+import os
+import sys
+
+def show(path):
+    for i in os.walk(path, followlinks=True):
+        try:
+            print(i[1])
+            if i[1]:
+                for k in i[i]:
+                    file_path = os.path.join(i[0],k)
+                    file_size = os.path.getsize(file_path)/1024**2
+                    result = str(file_path) + '-->' + str(file_size) + ' MB' + "\n"
+                    print result
+                    f.write(result)
+        except OSError:
+            continue
+
+
+f = open("/tmp/log.txt","a+")
+path = sys.argv[1]
+show(path)
+f.close()
+
+
 # #
 # #
 # # def copy_file(source_path, destination_path):

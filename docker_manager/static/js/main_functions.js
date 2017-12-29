@@ -20,8 +20,12 @@ function Pull_images() {
 
 //创建容器
 function create_container() {
-    var input_objects = $('#created_modal :text');
+    var input_objects = $('fieldset .col-sm-10 input');
     var checkbox_objects = $('#created_modal :checkbox');
+    var port_objects = $("fieldset .col-sm-2 :text");
+    var protocl_objects = $(".content .col-sm-2 select");
+    var port_list = new Array();
+    var protocl_list = new Array();
     var params = new Array();
     input_objects.each(function (k,v) {
         params.push(v.id + ',' + v.value);
@@ -32,8 +36,23 @@ function create_container() {
             params.push(v.id + ',' + v.checked)
         }
     });
-    var result = JSON.stringify(params);
-    $.post('/create_container/',{'create_params':result},function (result) {
+
+    port_objects.each(function (k,v) {
+        port_list.push(v.value)
+
+    });
+
+    protocl_objects.each(function (k,v) {
+        protocl_list.push(v.value)
+    });
+    alert(port_list);
+    alert(protocl_list);
+    // return false;
+    var result1 = JSON.stringify(params);
+    var result2 = JSON.stringify(port_list);
+    var result3 = JSON.stringify(protocl_list);
+    // alert(port_list[::2]);
+    $.post('/create_container/',{'create_params':result1, "port_list" : result2,"protocl_list":result3},function (result) {
         alert(result);
     })
 }
@@ -88,7 +107,6 @@ function registry_confirm()
         }
     });
 
-    // alert("sdasda" + event.returnValue);
 }
 
 //弹出自定义仓库界面
@@ -96,3 +114,39 @@ function custom_registry() {
     $("#custom_port").modal();
 
 }
+
+//自定义port添加的行和删除的行
+function custom_port(method,object="") {
+    if (method == "add"){
+        var str = `
+        <fieldset>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">端口映射</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" placeholder="外部端口">
+                </div>
+                <div class="col-sm-2">
+                    <select  class="form-control" data-title="Single Select" data-style="btn-default btn-block" data-menu-style="dropdown-blue" tabindex="-98"><option class="bs-title-option" value="">选择协议</option>
+                        <option>tcp</option>
+                        <option>udp</option>
+                    </select>
+                </div>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" placeholder="内部端口">
+                </div>
+                <div class="col-sm-2">
+                    <a href="#" class="btn btn-simple btn-danger btn-icon remove" onclick="var object=$(this);custom_port('delete',object);"><i class="pe-7s-trash"></i></a>
+                </div>
+            </div>
+        </fieldset>`
+        $("#port_area").append(str);
+
+    }
+    if (method == "delete"){
+        console.log(object);
+        object.parents("fieldset").remove();
+    }
+}
+
+
+
