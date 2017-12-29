@@ -427,8 +427,8 @@
 </div>
 
 <!---loading 遮罩层-->
-<div style="height: 100%;width: 100%;background-color:grey;opacity: 0.5;z-index: 99999;">
-    我是测试的遮罩层
+<div style="position:fixed;height: 100%;width: 100%;background-color:grey;opacity: 0.5;z-index: 99999;bottom: 0;display: none" id="black_cover">
+    <img src="/static/images/cover_loading.gif" style="height: 100%;width: 100%">
 
 
 </div>
@@ -513,10 +513,12 @@
 
 		// restart record
 		table.on( 'click', '.edit', function () {
+		     $("#black_cover").show();
 		     $tr = $(this).closest('tr');
 		     var data = table.row($tr).data();
              $.post('/index/',{'action':'restart','container_name':data[0]},function (result) {
-                 alert(data[0] + " " + result);
+                     $("#black_cover").hide();
+                     alert(data[0] + " " + result);
                      var modify_name = data[0] + "_status"
                      var status_object = document.getElementById(modify_name);
                      status_object.style.color = "green";
@@ -528,10 +530,12 @@
 
 		// Delete a record
 		table.on( 'click', '.remove', function (e) {
+		    $("#black_cover").show();
 		    $tr = $(this).closest('tr');
             var data = table.row($tr).data();
 
              $.post('/index/',{'action':'delete','container_name':data[0]},function (result) {
+                 $("#black_cover").hide();
                  alert(data[0] + " " + result);
                  table.row($tr).remove().draw();
              })
@@ -547,8 +551,10 @@
 		     if (status_object.innerText == "Running"){
 		         alert(data[0] + "已经在运行状态！");
              }else {
+		         $("#black_cover").show();
 		         $.post('/index/',{'action':'start','container_name':data[0]},function (result) {
-                     alert(data[0] + " " + result);
+                     $("#black_cover").hide();
+		             alert(data[0] + " " + result);
 
                      status_object.style.color = "green";
                      status_object.innerText = "running";
@@ -568,8 +574,10 @@
 		     if (status_object.innerText == "exited"){
 		         alert(data[0] + "未被启动！");
              }else {
+		         $("#black_cover").show();
 		         $.post('/index/',{'action':'stop','container_name':data[0]},function (result) {
-                     alert(data[0] + " " + result);
+                     $("#black_cover").hide();
+		             alert(data[0] + " " + result);
                      status_object.style.color = "red";
                      status_object.innerText = "exited";
 
