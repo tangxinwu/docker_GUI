@@ -13,11 +13,4 @@ class ImagePull(models.Model):
     PullStatus = models.SmallIntegerField('下载状态', choices=PullStatus_dict)
     pid = models.IntegerField('下载的pid',blank=True,default=None)
 
-class LocalRegistry(models.Model):
-    """
-    本地仓库管理表
-    """
-    RegistryName = models.CharField("仓库名", max_length=50)
-    RegistryImage = models.CharField("仓库中的镜像", max_length=1000, blank=True, null=True)
-
 

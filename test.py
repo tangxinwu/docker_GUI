@@ -255,4 +255,21 @@ for i in all_data:
 
 f.close()
 
+import os
 
+def check_static_file(reqeust):
+    base_path = r"/home/www/resources/online_data/pdf_reader/resource"
+    passed_path = reqeust.GET.get("path", "")
+    if path:
+        try:
+            temp_res = os.listdir(os.path.join(base_path, passed_path))
+            result = [str(os.path.join(base_path, passed_path)), [], []]
+            for i in temp_res:
+                if os.path.isdir(os.path.join(base_path, passed_path), i):
+                    result[1].append(i)
+                else:
+                    result[2].append(i)
+            return HttpResponse(result)
+        except OSError:
+            return HttpResponse("Not such type")
+    return HttpResponse("No input selected!")

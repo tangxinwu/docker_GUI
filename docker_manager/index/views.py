@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from index.DockerPull import *
 from index.models import *
 import subprocess
+import json
 
 
 # Create your views here.
@@ -87,7 +88,9 @@ def status_check(request):
         if image_name:
             status = ImagePull.objects.filter(ImageName=image_name)[0].PullStatus
             return HttpResponse(status)
-    return HttpResponse('没有输入！')
+    for i in request.META.keys():
+        print(i)
+    return HttpResponse(request.META.get("PATH_INFO"))
 
 
 @csrf_exempt
@@ -165,15 +168,33 @@ def delete_image(request):
 @csrf_exempt
 def create_local_registry(request):
     """
-    创建本地仓库
+    本地仓库显示界面
     :param request:
     :return:
     """
-    if request.POST:
-        action = request.POST.get("action", "")
-        DP = DockerPull(method="New_method")
-        if action == "check_registry":
-            flag = DP.image_isExsit(("registry", "latest"))
-            if not flag:
-                return HttpResponse(flag)
+    dp = DockerCheck()
+    dp.set_object("containers")
+    if request.POST.get("registry_name", ""):  # 传入本地仓库名字 查询本地仓库镜像
+        registry_name = request.POST.get("registry_name", "")
+        port = dp.select_object(name=registry_name).attrs.get("NetworkSettings").get("Ports").get("5000/tcp")[0].get("HostPort")
+        cmd = "curl -XGET http://localhost:%s/v2/_catalog" % str(port)
+        res = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        temp_res = re.findall("{.*?}", str(list(res.stdout)))
+        image_list = eval(temp_res[0]).get("repositories")
+        tags_list = dict()
+        for image in image_list:
+            cmd = "curl -XGET http://localhost:%s/v2/%s/tags/list" % (str(port), image)
+            print(cmd)
+            res = subprocess.Popen(cmd, shell=True,stdout=subprocess.PIPE)
+            temp_res = re.findall("{.*?}", str(list(res.stdout)))
+            print(temp_res)
+            tags_list.update({eval(temp_res[0]).get("name"): eval(temp_res[0]).get("tags")[0]})
+        return HttpResponse(json.dumps(tags_list, ensure_ascii=False))
+    all_containers = dp.list_objects()
+    res = list()
+    for i in all_containers:
+        for k in i.image.attrs.get("RepoTags"):
+            if "registry" in k:
+                res.append(i)
+                break
     return render(request, "local_registry.html", locals())

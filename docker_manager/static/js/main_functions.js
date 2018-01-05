@@ -148,7 +148,16 @@ function custom_port(method,object="") {
     }
 }
 
-//创建本地仓库
-
+//查找私有仓库的镜像列表
+function local_registry_detail(registry_name) {
+    $.post("/local_registry/",{"registry_name" : registry_name},function (result) {
+        alert(result);
+        // return false;
+        $(".modal-body tbody").empty();
+        $.each(JSON.parse(result), function (k,v) {
+            $(".modal-body tbody").append("<tr><td>" + k + "</td><td>"+ v + "</td></tr>");
+        });
+    });
+}
 
 
