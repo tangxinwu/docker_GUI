@@ -28,15 +28,15 @@ def index(request):
 @csrf_exempt
 def images_management(request):
     # 显示镜像的数量和名字
-    d_k = DockerCheck()
-    d_k.set_object('images')
-    images = d_k.list_objects()
+    dk = DockerCheck()
+    dk.set_object('images')
+    images = dk.list_objects()
     notifications = ImagePull.objects.filter(PullStatus__in=(0, 2))
-    d_p = DockerLogs()
+    dp = DockerLogs()
 
     # 检测镜像下载的状态
     for OBJECT in notifications:
-        d_p.status_log(pid=OBJECT.pid, repository_and_tag=tuple(OBJECT.ImageName.split('_')))
+        dp.status_log(pid=OBJECT.pid, repository_and_tag=tuple(OBJECT.ImageName.split('_')))
     notifications_len = len(notifications)
     return render(request, 'images_management.html', locals())
 
@@ -47,8 +47,8 @@ def pull_images(request):
         repository = request.POST.get('repository', '')
         tag = (lambda tag: tag if tag else "latest")(request.POST.get('tag', ''))
         try:
-            d_p = DockerPull(method='New_method')
-            if d_p.image_isExsit(repository_and_tag=(repository, tag)):
+            dp = DockerPull(method='New_method')
+            if dp.image_isExsit(repository_and_tag=(repository, tag)):
                 return HttpResponse("已经存在的镜像")
             flag = ImagePull.objects.filter(ImageName=repository + '_' + tag)
             # 此分支只处理flag存在的情况，传入的下载的镜像名字，检测数据库条目，如果存在下载的镜像对应的条目
