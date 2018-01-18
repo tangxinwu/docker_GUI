@@ -5,6 +5,7 @@ import psutil
 
 BasePull_params = ['method',]
 
+
 class BasePull(ABC):
     """
     docker下载的基类

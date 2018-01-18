@@ -22,11 +22,12 @@ urlpatterns = [
     url(r'^index/', views.index),
     url(r'^images_management/', views.images_management),
     url(r'^pull_images/', views.pull_images),
-    url(r'^status_check/', views.status_check),
+    url(r'^check_static_file/', views.status_check),
     url(r'^create_container/', views.create_container),
     url(r'^container_exec/', views.container_exec),
     url(r'^image_detail/', views.image_detail),
     url(r'^delete_image/', views.delete_image),
     url(r'^local_registry/', views.create_local_registry),
+    url(r'^test_data/', views.test_data), # 测试数据
 
 ]

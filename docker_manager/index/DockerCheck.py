@@ -25,6 +25,7 @@ class DockerCheck:
         else:
             # 先看下参数设置把
             pass
+        self.selected_object = ""
 
     def set_object(self, object_type):
         """
@@ -51,8 +52,9 @@ class DockerCheck:
         """
         name = kwargs.get('name', '')
         if not self.type or not name:
-            return "params error!Must be type or name!"
-        return getattr(self.client, self.type).get(name)
+            return "params error!Must be name or not uesd set_object method!"
+        self.selected_object = getattr(self.client, self.type).get(name)
+        return self.selected_object
 
     def change_container_status(self, selected_object, action):
         """
@@ -91,5 +93,42 @@ class DockerCheck:
         """
         return self.select_object(name=image_name).attrs
 
+    def check_cpuusage(self):
+        """
+        获取运行容器的的当前内部的cpu占用率
+        cpu使用率的算法为
+        var res <---- remote api response
+
+        var cpuDelta = res.cpu_stats.cpu_usage.total_usage -  res.precpu_stats.cpu_usage.total_usage;
+        var systemDelta = res.cpu_stats.system_cpu_usage - res.precpu_stats.system_cpu_usage;
+        var RESULT_CPU_USAGE = cpuDelta / systemDelta * 100;
+        :return:返回单个容器的使用率， (int)
+        """
+        all_params = self.selected_object.stats(stream=False)
+        total_usage = all_params.get("cpu_stats").get("cpu_usage").get("total_usage")
+        system_cpu_usage = all_params.get("cpu_stats").get("system_cpu_usage")
+        precpu_usage = all_params.get("precpu_stats").get("cpu_usage").get("total_usage")
+        precpu_system_usage = all_params.get("precpu_stats").get("system_cpu_usage")
+        cpuDelta = total_usage - precpu_usage
+        systemDelta = system_cpu_usage - precpu_system_usage
+        RESULT_CPU_USAGE = cpuDelta / systemDelta * 100
+        cpuCore = all_params.get("cpu_stats").get("online_cpus")
+        cpu_usage = round(RESULT_CPU_USAGE * cpuCore, 2)
+        return cpu_usage
+
+    def check_memoryusage(self):
+        """
+        返回当前容器内的内存使用率情况
+        现在的算法是
+        p1 = y1.get("memory_stats").get("stats").get("total_active_anon")
+        p2 = y1.get("memory_stats").get("limit")
+        p1/p2
+        :return:返回内存使用率（int）
+        """
+        all_params = self.selected_object.stats(stream=False)
+        total_memory = all_params.get("memory_stats").get("limit")
+        current_memory = all_params.get("memory_stats").get("stats").get("total_active_anon")
+        memory_usage = current_memory/total_memory*100
+        return memory_usage
 
 

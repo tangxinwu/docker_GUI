@@ -6,6 +6,7 @@ from index.DockerPull import *
 from index.models import *
 import subprocess
 import json
+from index.JsonModel import GenJSONBar, SeriesBar, SeriesPie, GenJSONPie
 
 
 # Create your views here.
@@ -83,14 +84,23 @@ def status_check(request):
     :param request:
     :return:
     """
-    if request.POST:
-        image_name = eval(list(request.POST.keys())[0]).get('name')[0]
-        if image_name:
-            status = ImagePull.objects.filter(ImageName=image_name)[0].PullStatus
-            return HttpResponse(status)
-    for i in request.META.keys():
-        print(i)
-    return HttpResponse(request.META.get("PATH_INFO"))
+    base_path = r"D:\\"
+    passed_path = request.GET.get("path", "")
+    print(passed_path)
+    if passed_path:
+        try:
+            temp_res = os.listdir(os.path.join(base_path, passed_path))
+            result = {passed_path: [[], []]}
+            for i in temp_res:
+                if os.path.isdir(os.path.join(os.path.join(base_path, passed_path), i)):
+                    result.get(passed_path)[0].append(i)
+                else:
+                    result.get(passed_path)[1].append(i)
+            result.get(passed_path)[1].sort()
+            return HttpResponse(json.dumps(result, ensure_ascii=False))
+        except OSError:
+            return HttpResponse("Not such type")
+    return HttpResponse("No input selected!")
 
 
 @csrf_exempt
@@ -184,10 +194,8 @@ def create_local_registry(request):
         tags_list = dict()
         for image in image_list:
             cmd = "curl -XGET http://localhost:%s/v2/%s/tags/list" % (str(port), image)
-            print(cmd)
             res = subprocess.Popen(cmd, shell=True,stdout=subprocess.PIPE)
             temp_res = re.findall("{.*?}", str(list(res.stdout)))
-            print(temp_res)
             tags_list.update({eval(temp_res[0]).get("name"): eval(temp_res[0]).get("tags")[0]})
         return HttpResponse(json.dumps(tags_list, ensure_ascii=False))
     all_containers = dp.list_objects()
@@ -198,3 +206,28 @@ def create_local_registry(request):
                 res.append(i)
                 break
     return render(request, "local_registry.html", locals())
+
+
+@csrf_exempt
+def test_data(request):
+    if request.POST:
+        dc = DockerCheck()
+        dc.set_object("containers")
+        cpu_usage = list()
+        container_name = list()
+        memory_usage = list()
+        for i in dc.list_objects():
+            if i.status == "running":
+                dc.select_object(name=i.name)
+                cpu_usage.append(dc.check_cpuusage())
+                container_name.append(i.name)
+                memory_usage.append(dc.check_memoryusage())
+        cpu_data = SeriesBar(name="cpu使用率", data=cpu_usage)
+        memory_data = SeriesBar(name="内存使用率", data=memory_usage)
+        legend_list = [i.name for i in locals().values() if i.__class__.__name__.startswith("Series")]
+        p1 = GenJSONBar(title="cpu使用率", legend=legend_list,
+                        xAxis=container_name, series=cpu_data, series1=memory_data)
+        last_result = p1.gen()
+        print(last_result)
+        return HttpResponse(json.dumps(last_result, ensure_ascii=False))
+    return HttpResponse("没有输出")

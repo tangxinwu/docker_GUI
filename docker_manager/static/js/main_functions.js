@@ -159,3 +159,30 @@ function local_registry_detail(registry_name) {
 }
 
 
+//显示容器图表的界面
+function display_echarts() {
+    $("#display_echarts").modal();
+    //初始化图表 设置两秒刷新 太快容易阻塞
+    setInterval(function () {
+        if ($("#display_echarts").css("display") == "block"){
+            get_echarts_data();
+        }else {
+            clearInterval();
+            return
+        }
+    }, 2000);
+
+}
+
+//容器界面获取图表数据
+
+function get_echarts_data() {
+    // 基于准备好的dom，初始化echarts实例
+    var myChart1 = echarts.init(document.getElementById('cpuusage_echarts_field'));
+    $.post("/test_data/", {"action":"cpu"},function (result) {
+        var option = JSON.parse(result);
+         myChart1.setOption(option);
+    });
+
+
+}

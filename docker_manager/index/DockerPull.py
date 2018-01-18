@@ -32,7 +32,7 @@ class DockerPull(BasePull):
         :return:
         """
         repository, tag = repository_and_tag
-        tag = (lambda tag:tag if tag else "latest")(tag)
+        tag = (lambda tag: tag if tag else "latest")(tag)
         self.tag = repository + "_" + tag
         self.result = self.client.pull(repository, tag=tag)
         return self
