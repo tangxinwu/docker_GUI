@@ -23,7 +23,7 @@ import settings
 
 class DockerPull(BasePull):
     def __init__(self, **kwargs):
-        BasePull.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
     def single_pull(self, repository_and_tag):
         """
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     tag = sys.argv[2]
     try:
         DP = DockerPull()
-        DP.single_pull((repository,tag))
+        DP.single_pull((repository, tag))
     except docker.errors.APIError:
         print("连接网路超时，请稍后再试！")
 

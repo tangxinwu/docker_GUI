@@ -4,8 +4,8 @@ docker 查询参数
 
 """
 
-
 import docker
+
 type_params = ('containers', 'images',)
 
 
@@ -128,7 +128,7 @@ class DockerCheck:
         all_params = self.selected_object.stats(stream=False)
         total_memory = all_params.get("memory_stats").get("limit")
         current_memory = all_params.get("memory_stats").get("stats").get("total_active_anon")
-        memory_usage = current_memory/total_memory*100
+        memory_usage = round(current_memory/total_memory, 2)*100
         return memory_usage
 
 

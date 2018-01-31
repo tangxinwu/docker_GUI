@@ -210,24 +210,26 @@ def create_local_registry(request):
 
 @csrf_exempt
 def test_data(request):
-    if request.POST:
+    name = request.POST.get("name", "")
+    if name:
         dc = DockerCheck()
         dc.set_object("containers")
         cpu_usage = list()
         container_name = list()
         memory_usage = list()
-        for i in dc.list_objects():
-            if i.status == "running":
-                dc.select_object(name=i.name)
-                cpu_usage.append(dc.check_cpuusage())
-                container_name.append(i.name)
-                memory_usage.append(dc.check_memoryusage())
+        dc.select_object(name=name)
+        flag = dc.selected_object.status
+        if flag == "running":
+            cpu_usage.append(dc.check_cpuusage())
+            container_name.append(name)
+            memory_usage.append(dc.check_memoryusage())
+        else:
+            return HttpResponse("容器没有启动！")
         cpu_data = SeriesBar(name="cpu使用率", data=cpu_usage)
         memory_data = SeriesBar(name="内存使用率", data=memory_usage)
         legend_list = [i.name for i in locals().values() if i.__class__.__name__.startswith("Series")]
-        p1 = GenJSONBar(title="cpu使用率", legend=legend_list,
+        p1 = GenJSONBar(title="cpu/mem使用率", legend=legend_list,
                         xAxis=container_name, series=cpu_data, series1=memory_data)
         last_result = p1.gen()
-        print(last_result)
         return HttpResponse(json.dumps(last_result, ensure_ascii=False))
     return HttpResponse("没有输出")

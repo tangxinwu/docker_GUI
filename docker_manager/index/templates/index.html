@@ -9,11 +9,6 @@
 
 	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
-
-
-
-
-
     <!-- Bootstrap core CSS     -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
 
@@ -28,7 +23,6 @@
     <link href="/static/css/font-awesome.min.css" rel="stylesheet">
     <link href='/static/css/685fd913f1e14aebad0cc9d3713ee469.css' rel='stylesheet' type='text/css'>
     <link href="/static/css/pe-icon-7-stroke.css" rel="stylesheet" />
-
 </head>
 <body class="sidebar-mini">
 
@@ -130,41 +124,6 @@
                             </a>
                         </li>
 
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="fa fa-gavel"></i>
-                                <p class="hidden-md hidden-lg">
-                                    Actions
-                                    <b class="caret"></b>
-                                </p>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Create New Post</a></li>
-                                <li><a href="#">Manage Something</a></li>
-                                <li><a href="#">Do Nothing</a></li>
-                                <li><a href="#">Submit to live</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">Another Action</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="fa fa-bell-o"></i>
-                                <span class="notification">5</span>
-                                <p class="hidden-md hidden-lg">
-    								Notifications
-    								<b class="caret"></b>
-    							</p>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Notification 1</a></li>
-                                <li><a href="#">Notification 2</a></li>
-                                <li><a href="#">Notification 3</a></li>
-                                <li><a href="#">Notification 4</a></li>
-                                <li><a href="#">Another notification</a></li>
-                            </ul>
-                        </li>
 
                         <li class="dropdown dropdown-with-icons">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -235,17 +194,6 @@
                 								<th class="disabled-sorting text-right">操作</th>
                 							</tr>
                 						</thead>
-{#                						<tfoot>#}
-{#                							<tr>#}
-{#                								<th>容器名</th>#}
-{#                								<th>容器ID</th>#}
-{#                								<th>镜像</th>#}
-{#                								<th>状态</th>#}
-{#                								<th>创建时间</th>#}
-{#                                                <th>映射端口</th>#}
-{#                								<th class="text-right">操作</th>#}
-{#                							</tr>#}
-{#                						</tfoot>#}
                 						<tbody>
                                         {% for docker in containers %}
                 							<tr>
@@ -269,6 +217,7 @@
                 									<a href="#" class="btn btn-simple btn-warning btn-icon edit"><i class="pe-7s-refresh-2"></i></a>
                 									<a href="#" class="btn btn-simple btn-danger btn-icon remove"><i class="pe-7s-trash"></i></a>
                                                     <a href="#" class="btn btn-simple btn btn-icon view"><i class="pe-7s-note2"></i></a>
+                                                    <a href="#" class="btn btn-simple btn btn-icon usage"><i class="pe-7s-graph3"></i></a>
                 								</td>
                 							</tr>
                                         {% endfor %}
@@ -363,7 +312,7 @@
 
             </div>
             <div class="modal-footer" style="text-align: center;">
-                <button type="button" data-dismiss="modal" class="btn btn-info btn-fill btn-wd" onclick="int=window.clearInterval(int);" >关闭</button>
+                <button type="button" data-dismiss="modal" class="btn btn-info btn-fill btn-wd" >关闭</button>
             </div>
         </div>
 
@@ -408,12 +357,16 @@
 <!---loading 遮罩层-->
 <div style="position:fixed;height: 100%;width: 100%;background-color:grey;opacity: 0.5;z-index: 99999;bottom: 0;display: none" id="black_cover">
     <img src="/static/images/cover_loading.gif" style="height: 100%;width: 100%">
-
-
 </div>
 
 <!--loading 遮罩层结束-->
 
+<!---fetching 遮罩层-->
+<div style="position:fixed;height: 100%;width: 100%;background-color:grey;opacity: 0.5;z-index: 99999;bottom: 0;display: none" id="fetch_black_cover">
+    <img src="/static/images/fetch_black_cover.gif" style="margin: 0 0 0 25%">
+</div>
+
+<!--fetching 遮罩层结束-->
 </body>
 
     <!--   Core JS Files and PerfectScrollbar library inside jquery.ui   -->
@@ -576,6 +529,14 @@
 		    $('#container_name').val(data[0]);
 		    $('#container_exec').modal();
 		} );
+
+		//查看图表
+        table.on('click', ".usage", function (e) {
+            $tr = $(this).closest("tr");
+            var data = table.row($tr).data();
+            $("#fetch_black_cover").show();
+            display_echarts(data[0]);
+        });
 
 
 	});
